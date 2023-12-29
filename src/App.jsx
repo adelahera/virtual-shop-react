@@ -2,44 +2,62 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";	
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import Search from './components/Search';
+import Search from './components/SearchBar';
+import SearchResults from './components/SearchResults';
+import Dropdown from './components/Dropdown';
 import './App.css'; 
 
 const App = () => {
-//   const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [buttonPressed, setButtonPressed] = useState(false);
 
-  const searchProducts = async (query) => {
-    // Hacer la llamada a la API de Django con la query de búsqueda
-    // Actualizar setSearchResults con los resultados obtenidos
-    // Ejemplo ficticio:
-    // const response = await fetch(`/api/products?search=${query}`);
-    // const data = await response.json();
-    // setSearchResults(data);
-    console.log(`Realizar búsqueda de productos con la query: ${query}`);
+  const handleSearch = async (query) => {
+    try {
+      setIsLoading(true);
+      setButtonPressed(true);
+      const response = await fetch(`http://127.0.0.1:8000/shop/api/products/search?search=${query}`);
+      const data = await response.json();
+      console.log(data)
+
+      setSearchResults(data);
+      
+      console.log(data)
+    } catch (error) {
+      console.error('Error al realizar la búsqueda:', error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const handleCategory = async (category) => {
+    var cat = category.name.toLowerCase();
+    try {
+      setIsLoading(true);
+      setButtonPressed(true);
+      const response = await fetch(`http://127.0.0.1:8000/shop/api/products/category?search=${cat}`)
+      const data = await response.json();
+      console.log(data)
+      setSearchResults(data);
+    }
+    catch (error) {
+      console.error('Error al realizar la búsqueda:', error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
   return (
-    <Container fluid className="app-container">
-      <Row className="justify-content-center align-items-center">
-        <Col xs={20} md={20} lg={20}>
-          <div className="title-container">
-            <p>React Search </p>
-          </div>
-          <Search onSearch={searchProducts} />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          {/* Mostrar los resultados de la búsqueda */}
-          <ul>
-            {/* {searchResults.map((product) => (
-              <li key={product.id}>{product.name}</li>
-            ))} */}
-          </ul>
-        </Col>
-      </Row>
-    </Container>
-  );
-};
+      <Container fluid className="app-container">
+        <div className="title-container">
+          <p>React Search</p>
+        </div>
+        <Row className="menu-container">
+            <Search onSearch={handleSearch}/>
+            <Dropdown onSelectCategory={handleCategory}/> 
+        </Row>
+        <SearchResults results={searchResults} isLoading={isLoading} buttonPressed={buttonPressed}/>
+      </Container>
+    );
+  };
 
 export default App;
