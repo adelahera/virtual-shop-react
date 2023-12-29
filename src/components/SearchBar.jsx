@@ -1,4 +1,3 @@
-// src/components/SearchBar.jsx
 import React, { useState } from 'react';
 import { InputGroup, FormControl, Button } from 'react-bootstrap';
 
@@ -9,18 +8,25 @@ const SearchBar = ({ onSearch }) => {
     onSearch(query);
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  }
+
   return (
     <div className="search-bar-container">
-        <InputGroup className="mb-3">
+      <InputGroup className="mb-3">
         <FormControl
-            placeholder="Search for products"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search for products"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
         />
         <Button variant="outline-secondary" onClick={handleSearch}>
-            Search
+          Search
         </Button>
-        </InputGroup>
+      </InputGroup>
     </div>
   );
 };
